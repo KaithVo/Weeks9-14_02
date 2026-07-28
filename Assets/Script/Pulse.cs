@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+
 using UnityEngine;
 
 public class Pulse : MonoBehaviour
@@ -7,12 +7,13 @@ public class Pulse : MonoBehaviour
 
     public AnimationCurve pulseCurve;
 
+    TrailRenderer TrailRenderer;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
 
-
+        TrailRenderer = GetComponent<TrailRenderer>();
     }
 
     // Update is called once per frame
@@ -20,11 +21,15 @@ public class Pulse : MonoBehaviour
     {
         Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
 
+    https://discussions.unity.com/t/trail-renderer-emit-switch-off/735579/8
+
         //miving right
         screenPos.x += speed * Time.deltaTime;
+       
         if (screenPos.x > Screen.width)
         {
-            screenPos.x = 0;
+           TrailRenderer.emitting = false;
+           screenPos.x = 0;
         }
         // Use AnimationCurve for Y
         float t = screenPos.x / Screen.width;
@@ -34,5 +39,10 @@ public class Pulse : MonoBehaviour
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPos);
         transform.position = worldPos;
 
+        if (screenPos.x <= 1f)
+        {
+            TrailRenderer.Clear();      // removes any leftover trail
+            TrailRenderer.emitting = true;
+        }
     }
 }
