@@ -21,7 +21,9 @@ public class Pulse : MonoBehaviour
     {
         Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
 
-    https://discussions.unity.com/t/trail-renderer-emit-switch-off/735579/8
+        //https://discussions.unity.com/t/trail-renderer-emit-switch-off/735579/8   
+        //using emtting to turn on and off the trail renderer, so it doesn't leave a trail when it wraps around the screen
+        //instead of toggle enabled which would turn off the trail renderer completely and not show any trail at all
 
         //miving right
         screenPos.x += speed * Time.deltaTime;
