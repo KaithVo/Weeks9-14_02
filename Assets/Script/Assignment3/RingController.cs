@@ -5,17 +5,30 @@ using UnityEngine.InputSystem;
 
 public class RingController : MonoBehaviour
 {
+
+    [Header("Movement")]
+
     public float moveSpeed = 5f;
-    public float limitX = 4f;
+    public float minX = -4f;
+    public float maxX = -4f;
 
     //throwing value
     [Header("Throw")]
-    public Transform ring;
     public AnimationCurve curve;
+    public float minDistance = 3f;
+    public float maxDistance = 8f;
     public float throwDistance = 2f;
     public float throwDuration = 1f;
 
+    [Header("Ring")]
+    public Transform ring;
 
+    [Header("Power")]
+    public Slider powerSlider;
+    public float chargeSpeed = 1f;
+
+
+    //private 
     private Vector2 moveInput;
     private bool charging;
     private bool throwing;
