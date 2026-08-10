@@ -9,6 +9,7 @@ public class RingController : MonoBehaviour
     public float limitX = 4f;
 
     //throwing value
+    [Header("Throw")]
     public Transform ring;
     public AnimationCurve curve;
     public float throwDistance = 2f;
@@ -72,6 +73,4 @@ public class RingController : MonoBehaviour
         }
 
     }
-    
-
 }
