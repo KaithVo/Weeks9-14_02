@@ -58,12 +58,13 @@ public class RingController : MonoBehaviour
             float value = curve.Evaluate(t);
 
             Vector3 pos = Vector3.Lerp(start, target, value);
-            pos.y += Mathf.Clamp(throwDistance, 0f, 5f); 
+            pos.y += Mathf.Clamp(throwDistance, 0f, 5f);
 
             ring.position = pos;
 
             yield return null;
-  
+
         }
+    }
 
 }
