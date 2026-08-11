@@ -20,10 +20,9 @@ public class RingController : MonoBehaviour
     [Header("Throw")]
     public AnimationCurve curve;
     public float throwDistance = 2f;
-    public float throwDuration = 1f;
+    public float throwDuration = 15f;
     public float minDistance = 3f;
     public float maxDistance = 8f;
-
 
 
     [Header("Power")]
@@ -35,6 +34,7 @@ public class RingController : MonoBehaviour
     public Cups cup;
 
     private GameObject currentRing;
+    public Transform player;
 
     private Vector2 moveInput;
     private float charge = 0f;
@@ -93,6 +93,7 @@ public class RingController : MonoBehaviour
 
         if (context.started) //if holding, charging the bar
         {
+
             charging = true;
             charge = 0f;
             powerSlider.value = 0f;
@@ -100,7 +101,7 @@ public class RingController : MonoBehaviour
         if (context.canceled) //if release, thow ring coroutine
         {
             charging = false;
-            ThrowRing();
+            StartCoroutine(ThrowRingCor());
         }
 
     }
@@ -109,29 +110,27 @@ public class RingController : MonoBehaviour
     /// 
     private void CreateNewRing()
     {
-        currentRing = Instantiate(ringPrefab, ring.position, Quaternion.identity);
+        currentRing = Instantiate(ringPrefab, ring.position, Quaternion.identity, player);
     }
     private void ThrowRing()
     {
         if (currentRing == null)
             return;
-        float distance = Mathf.Lerp(minDistance, maxDistance, charge);
-        StartCoroutine(ThrowRing(distance));
+        //float distance = Mathf.Lerp(minDistance, maxDistance, charge);
+        StartCoroutine(ThrowRingCor());
     }
 
 
     /// COROUTINE SECTION
     /// 
     //https://docs.unity3d.com/ScriptReference/Vector3-normalized.html
-    IEnumerator ThrowRing(float distance)
+    IEnumerator ThrowRingCor()
     {
         
         throwing = true;
 
         Vector3 startPosition = ring.transform.position;
-        Vector3 cupPosition = cup.transform.position;
-        Vector3 direction = (cupPosition - startPosition).normalized;
-        Vector3 targetPosition = startPosition + direction * distance;
+        Vector3 targetPosition = startPosition + Vector3.forward * Mathf.Lerp(minDistance, maxDistance, charge);
 
         float t = 0f;
 
@@ -149,9 +148,9 @@ public class RingController : MonoBehaviour
 
             yield return null;
         }
+
         ring.transform.position = targetPosition;
         // Tell the cup that the ring has landed
-        cup.RingLanded();
 
         yield return new WaitForSeconds(0.5f);
 
@@ -190,5 +189,6 @@ public class RingController : MonoBehaviour
 
         powerSlider.value = 0f;
 
-        CreateNewRing(); }
+        CreateNewRing(); 
+    }
 }

@@ -6,8 +6,9 @@ using TMPro;
 
 public class Cups : MonoBehaviour
 {
-   // https://www.reddit.com/r/Unity3D/comments/gjvcse/textmeshpro_prefab_instantiates_but_not_visible/?logging_in=true
+    // https://www.reddit.com/r/Unity3D/comments/gjvcse/textmeshpro_prefab_instantiates_but_not_visible/?logging_in=true
 
+    public int cupNumber;
 
     [Header("Animation")]
     public AnimationCurve curve;
@@ -33,6 +34,12 @@ public class Cups : MonoBehaviour
 
     private IEnumerator LiftCup()
     {
+        //reference gamemanger cuphit
+        // Replace this line in LiftCup():
+        // gameManager.cups();
+
+        // With the correct method call, likely intended to be CupHit with the cup's position:
+        gameManager.CupHit(transform.position);
 
         // Lift cup
         Vector3 startPosition = transform.position;
@@ -69,46 +76,5 @@ public class Cups : MonoBehaviour
         }
 
         transform.position = originalPosition;
-    }
-
-    private bool IsSecret()// 10% chance
-    {
-        int result = Random.Range(0, 100);
-
-        return result < 10;
-    }
-
-    private void DisplayAnimatedText(TextMeshProUGUI text)
-    {
-        text.gameObject.SetActive(true);
-
-        StartCoroutine(ShowText(text));
-    }
-
-    private IEnumerator ShowText(TextMeshProUGUI text)
-    {
-        float t = 0f;
-
-        while (t < 0.4f)
-        {
-            t += Time.deltaTime;
-
-            text.transform.localScale =Vector3.one *curve.Evaluate(t);
-
-            yield return null;
-        }
-
-        t = 0f;
-
-        while (t < 0.4f)
-        {
-            t += Time.deltaTime;
-
-            text.transform.localScale =Vector3.one *curve.Evaluate(1f - t);
-
-            yield return null;
-        }
-
-        text.gameObject.SetActive(false);
     }
 }
