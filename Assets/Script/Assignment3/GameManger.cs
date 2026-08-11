@@ -15,6 +15,9 @@ public class GameManger : MonoBehaviour
     public RingController player;
     public bool gameFinished = false;
 
+    [Header("Congratulations")]// for end game only
+    public GameObject congratulationsScreen;
+
     //UnityEvent
     public UnityEvent onScoreUpdated;
 
@@ -23,6 +26,8 @@ public class GameManger : MonoBehaviour
     {
         score = 0;
         gameFinished = false;
+        congratulationsScreen.SetActive(false);
+        UpdateScoreText();
     }
 
     // Update is called once per frame
@@ -32,17 +37,23 @@ public class GameManger : MonoBehaviour
     }
     public void AddScore()
     {
+        if (gameFinished)
+            return;
+
         score++;
         UpdateScoreText();
+        onScoreUpdated.Invoke();
+
         if (score >= winningScore)
         {
             WinGame();
         }
     }
+
     private void WinGame()
     {
         gameFinished = true;
-        //congratulationsScreen.SetActive(true);
+        congratulationsScreen.SetActive(true);
     }
 
     //update score
@@ -55,5 +66,8 @@ public class GameManger : MonoBehaviour
     {
         score = 0;
         gameFinished = false;
+        congratulationsScreen.SetActive(false);
+        UpdateScoreText();
+        player.ResetPlayer();
     }
 }

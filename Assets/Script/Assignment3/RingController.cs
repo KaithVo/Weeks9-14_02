@@ -31,8 +31,8 @@ public class RingController : MonoBehaviour
     public float chargeSpeed = 1f;
 
     //Reference
-    private GameManger gameManager;
-    private Cups cup;
+    public GameManger gameManager;
+    public Cups cup;
 
     private GameObject currentRing;
 
@@ -51,6 +51,9 @@ public class RingController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //keep update the game
+        if (gameManager.gameFinished)
+            return;
 
         MovePlayer();
 
@@ -83,6 +86,9 @@ public class RingController : MonoBehaviour
     public void OnThrow(InputAction.CallbackContext context)
     {
         if (throwing)
+            return;
+
+        if (gameManager.gameFinished)
             return;
 
         if (context.started) //if holding, charging the bar
@@ -148,12 +154,41 @@ public class RingController : MonoBehaviour
         cup.RingLanded();
 
         yield return new WaitForSeconds(0.5f);
+
         Destroy(currentRing);
+        currentRing = null;
 
         throwing = false;
 
         // Reset power bar
         charge = 0f;
         powerSlider.value = 0f;
+
+        if (!gameManager.gameFinished)
+        {
+            CreateNewRing();
+        }
     }
+
+    /// RESEET SECTON ///
+    ///
+
+    public void ResetPlayer()
+    {
+        //stop all coroutine and reset everything
+
+        StopAllCoroutines();
+        if (currentRing != null)
+        {
+            Destroy(currentRing);
+        }
+        currentRing = null;
+
+        charge = 0f;
+        charging = false;
+        throwing = false;
+
+        powerSlider.value = 0f;
+
+        CreateNewRing(); }
 }

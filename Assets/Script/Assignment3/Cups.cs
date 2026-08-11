@@ -23,11 +23,11 @@ public class Cups : MonoBehaviour
 
     void Start()
     {
+        //show if player succesfully got the cup or nor
         successText.gameObject.SetActive(false);
         failureText.gameObject.SetActive(false);
 
-        originalPosition =
-            transform.position;
+        originalPosition = transform.position;
     }
 
     public void RingLanded()
@@ -41,44 +41,29 @@ public class Cups : MonoBehaviour
 
         if (secret)
         {
-            DisplayAnimatedText(
-                successText
-            );
+            DisplayAnimatedText(successText);
 
             gameManager.AddScore();
         }
         else
         {
-            DisplayAnimatedText(
-                failureText
-            );
+            DisplayAnimatedText(failureText);
         }
 
         // Lift cup
-        Vector3 startPosition =
-            transform.position;
+        Vector3 startPosition = transform.position;
 
-        Vector3 endPosition =
-            startPosition +
-            Vector3.up * liftHeight;
+        Vector3 endPosition = startPosition + Vector3.up * liftHeight;
 
         float t = 0f;
 
         while (t < 1f)
         {
-            t +=
-                Time.deltaTime /
-                liftDuration;
+            t +=Time.deltaTime /liftDuration;
 
-            float value =
-                curve.Evaluate(t);
+            float value =curve.Evaluate(t);
 
-            transform.position =
-                Vector3.Lerp(
-                    startPosition,
-                    endPosition,
-                    value
-                );
+            transform.position =Vector3.Lerp(startPosition,endPosition,value);
 
             yield return null;
         }
@@ -90,49 +75,33 @@ public class Cups : MonoBehaviour
 
         while (t < 1f)
         {
-            t +=
-                Time.deltaTime /
-                liftDuration;
+            t +=Time.deltaTime /liftDuration;
 
-            float value =
-                curve.Evaluate(t);
+            float value =curve.Evaluate(t);
 
-            transform.position =
-                Vector3.Lerp(
-                    endPosition,
-                    originalPosition,
-                    value
-                );
+            transform.position =Vector3.Lerp(endPosition,originalPosition,value);
 
             yield return null;
         }
 
-        transform.position =
-            originalPosition;
+        transform.position = originalPosition;
     }
 
-    private bool IsSecret()
+    private bool IsSecret()// 10% chance
     {
-        int result =
-            Random.Range(0, 100);
+        int result = Random.Range(0, 100);
 
         return result < 10;
     }
 
-    private void DisplayAnimatedText(
-        TextMeshProUGUI text
-    )
+    private void DisplayAnimatedText(TextMeshProUGUI text)
     {
         text.gameObject.SetActive(true);
 
-        StartCoroutine(
-            ShowText(text)
-        );
+        StartCoroutine(ShowText(text));
     }
 
-    private IEnumerator ShowText(
-        TextMeshProUGUI text
-    )
+    private IEnumerator ShowText(TextMeshProUGUI text)
     {
         float t = 0f;
 
@@ -140,9 +109,7 @@ public class Cups : MonoBehaviour
         {
             t += Time.deltaTime;
 
-            text.transform.localScale =
-                Vector3.one *
-                curve.Evaluate(t);
+            text.transform.localScale =Vector3.one *curve.Evaluate(t);
 
             yield return null;
         }
@@ -153,9 +120,7 @@ public class Cups : MonoBehaviour
         {
             t += Time.deltaTime;
 
-            text.transform.localScale =
-                Vector3.one *
-                curve.Evaluate(1f - t);
+            text.transform.localScale =Vector3.one *curve.Evaluate(1f - t);
 
             yield return null;
         }
