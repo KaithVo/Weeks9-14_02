@@ -1,7 +1,10 @@
-using UnityEngine;
-using System.Collections;
-using UnityEngine.InputSystem;
 
+using System;
+using System.Collections;
+using System.Numerics;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class RingController : MonoBehaviour
 {
@@ -12,26 +15,33 @@ public class RingController : MonoBehaviour
     public float minX = -4f;
     public float maxX = -4f;
 
+    [Header("Ring")]
+    public Transform ring;
+
     //throwing value
     [Header("Throw")]
     public AnimationCurve curve;
-    public float minDistance = 3f;
-    public float maxDistance = 8f;
     public float throwDistance = 2f;
     public float throwDuration = 1f;
+    public float minDistance = 3f;
+    public float maxDistance = 8f;
 
-    [Header("Ring")]
-    public Transform ring;
+
 
     [Header("Power")]
     public Slider powerSlider;
     public float chargeSpeed = 1f;
 
+    //Reference
+    public GameManger gameManager;
+    public Cups cup;
 
-    //private 
+    private GameObject currentRing;
+
     private Vector2 moveInput;
-    private bool charging;
-    private bool throwing;
+    private float charge = 0f;
+    private bool charging = false;
+    private bool throwing = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -43,13 +53,29 @@ public class RingController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 pos = transform.position;
-        pos.x += moveInput.x * moveSpeed * Time.deltaTime;
-        pos.x = Mathf.Clamp(pos.x, -limitX, limitX); // limit them inside the screen
-        transform.position = pos;
+
+
+        //charge power
+        if (charging)
+        {
+            charge += chargeSpeed * Time.deltaTime;
+            charge = Mathf.Clamp01(charge);
+            powerSlider.value = charge;
+        }
 
     }
 
+    void MovePlayer()
+    {
+        Vector3 pos = transform.position;
+        pos.x += moveInput.x * moveSpeed * Time.deltaTime;
+        pos.x = Mathf.Clamp(pos.x, minX, maxX); // limit them inside the screen
+        transform.position = pos;
+    }
+
+
+    ///INPUT///
+    ///
     public void OnMove(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
