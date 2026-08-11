@@ -6,9 +6,9 @@ using TMPro;
 
 public class Cups : MonoBehaviour
 {
-    [Header("UI")]
-    public TextMeshProUGUI successText;
-    public TextMeshProUGUI failureText;
+    // https://www.reddit.com/r/Unity3D/comments/gjvcse/textmeshpro_prefab_instantiates_but_not_visible/?logging_in=true
+
+    public int cupNumber;
 
     [Header("Animation")]
     public AnimationCurve curve;
@@ -23,11 +23,8 @@ public class Cups : MonoBehaviour
 
     void Start()
     {
-        successText.gameObject.SetActive(false);
-        failureText.gameObject.SetActive(false);
 
-        originalPosition =
-            transform.position;
+        originalPosition = transform.position;
     }
 
     public void RingLanded()
@@ -37,48 +34,27 @@ public class Cups : MonoBehaviour
 
     private IEnumerator LiftCup()
     {
-        bool secret = IsSecret();
+        //reference gamemanger cuphit
+        // Replace this line in LiftCup():
+        // gameManager.cups();
 
-        if (secret)
-        {
-            DisplayAnimatedText(
-                successText
-            );
-
-            gameManager.AddScore();
-        }
-        else
-        {
-            DisplayAnimatedText(
-                failureText
-            );
-        }
+        // With the correct method call, likely intended to be CupHit with the cup's position:
+        gameManager.CupHit(transform.position);
 
         // Lift cup
-        Vector3 startPosition =
-            transform.position;
+        Vector3 startPosition = transform.position;
 
-        Vector3 endPosition =
-            startPosition +
-            Vector3.up * liftHeight;
+        Vector3 endPosition = startPosition + Vector3.up * liftHeight;
 
         float t = 0f;
 
         while (t < 1f)
         {
-            t +=
-                Time.deltaTime /
-                liftDuration;
+            t +=Time.deltaTime /liftDuration;
 
-            float value =
-                curve.Evaluate(t);
+            float value =curve.Evaluate(t);
 
-            transform.position =
-                Vector3.Lerp(
-                    startPosition,
-                    endPosition,
-                    value
-                );
+            transform.position =Vector3.Lerp(startPosition,endPosition,value);
 
             yield return null;
         }
@@ -90,76 +66,15 @@ public class Cups : MonoBehaviour
 
         while (t < 1f)
         {
-            t +=
-                Time.deltaTime /
-                liftDuration;
+            t +=Time.deltaTime /liftDuration;
 
-            float value =
-                curve.Evaluate(t);
+            float value =curve.Evaluate(t);
 
-            transform.position =
-                Vector3.Lerp(
-                    endPosition,
-                    originalPosition,
-                    value
-                );
+            transform.position =Vector3.Lerp(endPosition,originalPosition,value);
 
             yield return null;
         }
 
-        transform.position =
-            originalPosition;
-    }
-
-    private bool IsSecret()
-    {
-        int result =
-            Random.Range(0, 100);
-
-        return result < 10;
-    }
-
-    private void DisplayAnimatedText(
-        TextMeshProUGUI text
-    )
-    {
-        text.gameObject.SetActive(true);
-
-        StartCoroutine(
-            ShowText(text)
-        );
-    }
-
-    private IEnumerator ShowText(
-        TextMeshProUGUI text
-    )
-    {
-        float t = 0f;
-
-        while (t < 0.4f)
-        {
-            t += Time.deltaTime;
-
-            text.transform.localScale =
-                Vector3.one *
-                curve.Evaluate(t);
-
-            yield return null;
-        }
-
-        t = 0f;
-
-        while (t < 0.4f)
-        {
-            t += Time.deltaTime;
-
-            text.transform.localScale =
-                Vector3.one *
-                curve.Evaluate(1f - t);
-
-            yield return null;
-        }
-
-        text.gameObject.SetActive(false);
+        transform.position = originalPosition;
     }
 }
