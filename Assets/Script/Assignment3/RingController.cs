@@ -1,3 +1,4 @@
+
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,6 +15,7 @@ public class RingController : MonoBehaviour
 
     [Header("Ring")]
     public GameObject ringPrefab;
+    //public Transform ring;
 
     //throwing value
     [Header("Throw")]
@@ -24,16 +26,16 @@ public class RingController : MonoBehaviour
     public float maxDistance = 8f;
 
 
-
     [Header("Power")]
     public Slider powerSlider;
     public float chargeSpeed = 1f;
 
     //Reference
-    private GameManger gameManager;
-    private Cups cup;
+    public GameManger gameManager;
+    //public Cups cup;
 
     private GameObject currentRing;
+    public Transform player;
 
     private Vector2 moveInput;
     private float charge = 0f;
@@ -50,6 +52,9 @@ public class RingController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //keep update the game
+        if (gameManager.gameFinished)
+            return;
 
         MovePlayer();
 
@@ -84,8 +89,12 @@ public class RingController : MonoBehaviour
         if (throwing)
             return;
 
+        if (gameManager.gameFinished)
+            return;
+
         if (context.started) //if holding, charging the bar
         {
+
             charging = true;
             charge = 0f;
             powerSlider.value = 0f;
@@ -93,7 +102,7 @@ public class RingController : MonoBehaviour
         if (context.canceled) //if release, thow ring coroutine
         {
             charging = false;
-            ThrowRing();
+            StartCoroutine(ThrowRingCor());
         }
 
     }
@@ -102,39 +111,20 @@ public class RingController : MonoBehaviour
     /// 
     private void CreateNewRing()
     {
-<<<<<<< Updated upstream
-        currentRing = Instantiate(ringPrefab, ring.position, Quaternion.identity);
-    }
-    private void ThrowRing()
-    {
-        if (currentRing == null)
-            return;
-        float distance = Mathf.Lerp(minDistance, maxDistance, charge);
-        StartCoroutine(ThrowRing(distance));
-    }
-
-=======
         currentRing = Instantiate(ringPrefab, transform.position, Quaternion.identity, player);
     }
->>>>>>> Stashed changes
+
 
     /// COROUTINE SECTION
     /// 
     //https://docs.unity3d.com/ScriptReference/Vector3-normalized.html
-    IEnumerator ThrowRing(float distance)
+    IEnumerator ThrowRingCor()
     {
-        
+
         throwing = true;
 
-<<<<<<< Updated upstream
-        Vector3 startPosition = ring.transform.position;
-        Vector3 cupPosition = cup.transform.position;
-        Vector3 direction = (cupPosition - startPosition).normalized;
-        Vector3 targetPosition = startPosition + direction * distance;
-=======
         Vector3 startPosition = currentRing.transform.position;
         Vector3 targetPosition = startPosition + Vector3.forward * Mathf.Lerp(minDistance, maxDistance, charge);
->>>>>>> Stashed changes
 
         float t = 0f;
 
@@ -152,22 +142,47 @@ public class RingController : MonoBehaviour
 
             yield return null;
         }
-<<<<<<< Updated upstream
-        ring.transform.position = targetPosition;
-=======
 
         currentRing.transform.position = targetPosition;
->>>>>>> Stashed changes
         // Tell the cup that the ring has landed
-        cup.RingLanded();
 
         yield return new WaitForSeconds(0.5f);
+
         Destroy(currentRing);
+        currentRing = null;
 
         throwing = false;
 
         // Reset power bar
         charge = 0f;
         powerSlider.value = 0f;
+
+        if (!gameManager.gameFinished)
+        {
+            CreateNewRing();
+        }
+    }
+
+    /// RESEET SECTON ///
+    ///
+
+    public void ResetPlayer()
+    {
+        //stop all coroutine and reset everything
+
+        StopAllCoroutines();
+        if (currentRing != null)
+        {
+            Destroy(currentRing);
+        }
+        currentRing = null;
+
+        charge = 0f;
+        charging = false;
+        throwing = false;
+
+        powerSlider.value = 0f;
+
+        CreateNewRing();
     }
 }
