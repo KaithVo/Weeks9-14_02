@@ -6,9 +6,8 @@ using TMPro;
 
 public class Cups : MonoBehaviour
 {
-    [Header("UI")]
-    public TextMeshProUGUI successText;
-    public TextMeshProUGUI failureText;
+   // https://www.reddit.com/r/Unity3D/comments/gjvcse/textmeshpro_prefab_instantiates_but_not_visible/?logging_in=true
+
 
     [Header("Animation")]
     public AnimationCurve curve;
@@ -23,9 +22,6 @@ public class Cups : MonoBehaviour
 
     void Start()
     {
-        //show if player succesfully got the cup or nor
-        successText.gameObject.SetActive(false);
-        failureText.gameObject.SetActive(false);
 
         originalPosition = transform.position;
     }
@@ -37,18 +33,6 @@ public class Cups : MonoBehaviour
 
     private IEnumerator LiftCup()
     {
-        bool secret = IsSecret();
-
-        if (secret)
-        {
-            DisplayAnimatedText(successText);
-
-            gameManager.AddScore();
-        }
-        else
-        {
-            DisplayAnimatedText(failureText);
-        }
 
         // Lift cup
         Vector3 startPosition = transform.position;

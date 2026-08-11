@@ -18,8 +18,15 @@ public class GameManger : MonoBehaviour
     [Header("Congratulations")]// for end game only
     public GameObject congratulationsScreen;
 
+    [Header("ResultText")]
+    public TextMeshProUGUI successText;
+    public TextMeshProUGUI failureText;
+
+
     //UnityEvent
     public UnityEvent onScoreUpdated;
+
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -27,6 +34,10 @@ public class GameManger : MonoBehaviour
         score = 0;
         gameFinished = false;
         congratulationsScreen.SetActive(false);
+
+        successText.gameObject.SetActive(false);
+        failureText.gameObject.SetActive(false);
+
         UpdateScoreText();
     }
 
