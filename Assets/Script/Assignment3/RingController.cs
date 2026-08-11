@@ -14,7 +14,6 @@ public class RingController : MonoBehaviour
 
     [Header("Ring")]
     public GameObject ringPrefab;
-    public Transform ring;
 
     //throwing value
     [Header("Throw")]
@@ -103,6 +102,7 @@ public class RingController : MonoBehaviour
     /// 
     private void CreateNewRing()
     {
+<<<<<<< Updated upstream
         currentRing = Instantiate(ringPrefab, ring.position, Quaternion.identity);
     }
     private void ThrowRing()
@@ -113,6 +113,10 @@ public class RingController : MonoBehaviour
         StartCoroutine(ThrowRing(distance));
     }
 
+=======
+        currentRing = Instantiate(ringPrefab, transform.position, Quaternion.identity, player);
+    }
+>>>>>>> Stashed changes
 
     /// COROUTINE SECTION
     /// 
@@ -122,10 +126,15 @@ public class RingController : MonoBehaviour
         
         throwing = true;
 
+<<<<<<< Updated upstream
         Vector3 startPosition = ring.transform.position;
         Vector3 cupPosition = cup.transform.position;
         Vector3 direction = (cupPosition - startPosition).normalized;
         Vector3 targetPosition = startPosition + direction * distance;
+=======
+        Vector3 startPosition = currentRing.transform.position;
+        Vector3 targetPosition = startPosition + Vector3.forward * Mathf.Lerp(minDistance, maxDistance, charge);
+>>>>>>> Stashed changes
 
         float t = 0f;
 
@@ -139,11 +148,16 @@ public class RingController : MonoBehaviour
 
             //throwing arc
             pos.y += Mathf.Sin(value * Mathf.PI) * throwDistance;
-            ring.transform.position = pos;
+            currentRing.transform.position = pos;
 
             yield return null;
         }
+<<<<<<< Updated upstream
         ring.transform.position = targetPosition;
+=======
+
+        currentRing.transform.position = targetPosition;
+>>>>>>> Stashed changes
         // Tell the cup that the ring has landed
         cup.RingLanded();
 
