@@ -1,6 +1,4 @@
-
 using System.Collections;
-using System.Numerics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -12,7 +10,7 @@ public class RingController : MonoBehaviour
 
     public float moveSpeed = 5f;
     public float minX = -4f;
-    public float maxX = -4f;
+    public float maxX = 4f;
 
     [Header("Ring")]
     public GameObject ringPrefab;
@@ -33,8 +31,8 @@ public class RingController : MonoBehaviour
     public float chargeSpeed = 1f;
 
     //Reference
-    public GameManger gameManager;
-    public Cups cup;
+    private GameManger gameManager;
+    private Cups cup;
 
     private GameObject currentRing;
 
@@ -46,7 +44,7 @@ public class RingController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        CreateNewRing();
     }
     //https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/api/UnityEngine.InputSystem.InputAction.CallbackContext.html
     //https://docs.unity3d.com/Packages/com.unity.inputsystem@1.4/manual/Interactions.html
@@ -54,6 +52,7 @@ public class RingController : MonoBehaviour
     void Update()
     {
 
+        MovePlayer();
 
         //charge power
         if (charging)
@@ -74,7 +73,7 @@ public class RingController : MonoBehaviour
     }
 
 
-    ///INPUT///
+    /// INPUT SECTION ///
     ///
     public void OnMove(InputAction.CallbackContext context)
     {
@@ -83,36 +82,78 @@ public class RingController : MonoBehaviour
 
     public void OnThrow(InputAction.CallbackContext context)
     {
-        //https://docs.unity3d.com/ScriptReference/Vector3-normalized.html
-        IEnumerator ThrowRing(float distance)
+        if (throwing)
+            return;
+
+        if (context.started) //if holding, charging the bar
         {
-            throwing = true;
-
-            Vector3 startPosition = ring.transform.position;
-            Vector3 cupPosition = cup.transform.position;
-            Vector3 direction = (cupPosition - startPosition).normalized;
-            Vector3 targetPosition = startPosition + direction * distance;
-
-            float t = 0f;
-
-            while (t < 1f)
-            {
-                t += Time.deltaTime / throwDuration;
-
-                float value = curve.Evaluate(t);
-
-                Vector3 pos = Vector3.Lerp(start, goal, value);
-
-                //throwing arc
-                pos.y += Mathf.Sin(value * Mathf.PI) * throwDistance;
-                ring.transform.position = pos;
-
-                yield return null;
-            }
-            ring.transform.position = targetPosition;
-
-            throwing = false;
+            charging = true;
+            charge = 0f;
+            powerSlider.value = 0f;
+        }
+        if (context.canceled) //if release, thow ring coroutine
+        {
+            charging = false;
+            ThrowRing();
         }
 
+    }
+
+    /// RING SECTION ///
+    /// 
+    private void CreateNewRing()
+    {
+        currentRing = Instantiate(ringPrefab, ring.position, Quaternion.identity);
+    }
+    private void ThrowRing()
+    {
+        if (currentRing == null)
+            return;
+        float distance = Mathf.Lerp(minDistance, maxDistance, charge);
+        StartCoroutine(ThrowRing(distance));
+    }
+
+
+    /// COROUTINE SECTION
+    /// 
+    //https://docs.unity3d.com/ScriptReference/Vector3-normalized.html
+    IEnumerator ThrowRing(float distance)
+    {
+        
+        throwing = true;
+
+        Vector3 startPosition = ring.transform.position;
+        Vector3 cupPosition = cup.transform.position;
+        Vector3 direction = (cupPosition - startPosition).normalized;
+        Vector3 targetPosition = startPosition + direction * distance;
+
+        float t = 0f;
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime / throwDuration;
+
+            float value = curve.Evaluate(t);
+
+            Vector3 pos = Vector3.Lerp(startPosition, targetPosition, value);
+
+            //throwing arc
+            pos.y += Mathf.Sin(value * Mathf.PI) * throwDistance;
+            ring.transform.position = pos;
+
+            yield return null;
+        }
+        ring.transform.position = targetPosition;
+        // Tell the cup that the ring has landed
+        cup.RingLanded();
+
+        yield return new WaitForSeconds(0.5f);
+        Destroy(currentRing);
+
+        throwing = false;
+
+        // Reset power bar
+        charge = 0f;
+        powerSlider.value = 0f;
     }
 }
