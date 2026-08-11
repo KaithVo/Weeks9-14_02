@@ -12,7 +12,7 @@ public class GameManger : MonoBehaviour
     public TextMeshProUGUI scoreText;
 
     [Header("Player")]
-    public PlayerController player;
+    public RingController player;
     public bool gameFinished = false;
 
     //UnityEvent
@@ -32,11 +32,8 @@ public class GameManger : MonoBehaviour
     }
     public void AddScore()
     {
-
         score++;
         UpdateScoreText();
-        onScoreUpdated.Invoke();
-
         if (score >= winningScore)
         {
             WinGame();
@@ -45,6 +42,18 @@ public class GameManger : MonoBehaviour
     private void WinGame()
     {
         gameFinished = true;
-        congratulationsScreen.SetActive(true);
+        //congratulationsScreen.SetActive(true);
+    }
+
+    //update score
+    private void UpdateScoreText()
+    {
+        scoreText.text = "Score: " + score;
+    }
+
+    public void ResetGame()
+    {
+        score = 0;
+        gameFinished = false;
     }
 }

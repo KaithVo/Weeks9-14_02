@@ -1,5 +1,4 @@
 
-using System;
 using System.Collections;
 using System.Numerics;
 using UnityEngine;
@@ -16,6 +15,7 @@ public class RingController : MonoBehaviour
     public float maxX = -4f;
 
     [Header("Ring")]
+    public GameObject ringPrefab;
     public Transform ring;
 
     //throwing value
@@ -83,12 +83,15 @@ public class RingController : MonoBehaviour
 
     public void OnThrow(InputAction.CallbackContext context)
     {
-
-        IEnumerator ThrowRing(Vector3 goal)
+        //https://docs.unity3d.com/ScriptReference/Vector3-normalized.html
+        IEnumerator ThrowRing(float distance)
         {
             throwing = true;
 
-            Vector3 start = ring.position;
+            Vector3 startPosition = ring.transform.position;
+            Vector3 cupPosition = cup.transform.position;
+            Vector3 direction = (cupPosition - startPosition).normalized;
+            Vector3 targetPosition = startPosition + direction * distance;
 
             float t = 0f;
 
@@ -99,14 +102,14 @@ public class RingController : MonoBehaviour
                 float value = curve.Evaluate(t);
 
                 Vector3 pos = Vector3.Lerp(start, goal, value);
+
+                //throwing arc
                 pos.y += Mathf.Sin(value * Mathf.PI) * throwDistance;
-                ring.position = pos;
+                ring.transform.position = pos;
 
                 yield return null;
             }
-
-            // Return the ring to the player's hand
-            ring.position = transform.position + Vector3.up;
+            ring.transform.position = targetPosition;
 
             throwing = false;
         }
