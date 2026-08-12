@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -64,10 +65,31 @@ public class GameManger : MonoBehaviour
         } 
     }
 
+
+    //checking if the ring is overlapped on each one or not
+    public void CheckRingLanding(Vector3 ringPosition)
+    {
+        
+        bool ringHit = false;
+
+        for (int i = 0; i < cups.Count; i++)
+        {
+            if (ringHit == false)
+            {
+                if (cups[i].IsRingInside(ringPosition))
+                {
+                    cups[i].RingLanded();
+
+                    ringHit = true;
+                }
+            }
+        }
+    }
+
     public void AddScore()
     {
 
-        score++;
+        score += 1;
         UpdateScoreText();
         onScoreUpdated.Invoke();
 
@@ -96,8 +118,6 @@ public class GameManger : MonoBehaviour
     { 
 
         GameObject popup = Instantiate(popupPrefab, position, Quaternion.identity); 
-        TextMeshPro text = popup.GetComponent<TextMeshPro>();
-
         Destroy(popup, 1f);
 
     }

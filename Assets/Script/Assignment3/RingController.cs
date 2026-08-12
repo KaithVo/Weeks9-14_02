@@ -22,8 +22,8 @@ public class RingController : MonoBehaviour
     public AnimationCurve curve;
     public float throwDistance = 2f;
     public float throwDuration = 1f;
-    public float minDistance = 3f;
-    public float maxDistance = 8f;
+    public float minDistance = 5f;
+    public float maxDistance = 10f;
 
 
     [Header("Power")]
@@ -124,8 +124,10 @@ public class RingController : MonoBehaviour
         throwing = true;
 
         Vector3 startPosition = currentRing.transform.position;
-        Vector3 targetPosition = startPosition + Vector3.forward * Mathf.Lerp(minDistance, maxDistance, charge);
 
+        float distance = Mathf.Lerp(minDistance, maxDistance, charge);
+
+        Vector3 targetPosition = startPosition + Vector3.up * distance;
         float t = 0f;
 
         while (t < 1f)
@@ -145,6 +147,7 @@ public class RingController : MonoBehaviour
 
         currentRing.transform.position = targetPosition;
         // Tell the cup that the ring has landed
+        gameManager.CheckRingLanding(currentRing.transform.position);
 
         yield return new WaitForSeconds(0.5f);
 

@@ -7,8 +7,8 @@ using TMPro;
 public class Cups : MonoBehaviour
 {
     // https://www.reddit.com/r/Unity3D/comments/gjvcse/textmeshpro_prefab_instantiates_but_not_visible/?logging_in=true
-
-    public int cupNumber;
+    [Header("Cup")]
+    public float hitRadius = 0.5f;
 
     [Header("Animation")]
     public AnimationCurve curve;
@@ -32,13 +32,19 @@ public class Cups : MonoBehaviour
         StartCoroutine(LiftCup());
     }
 
+    //bool condition if the ring is land on the cup or not
+    public bool IsRingInside(Vector3 ringPosition)
+    {
+        float distance = Vector3.Distance(ringPosition,transform.position);
+
+        return distance <= hitRadius;
+    }
     private IEnumerator LiftCup()
     {
         //reference gamemanger cuphit
         // Replace this line in LiftCup():
         // gameManager.cups();
 
-        // With the correct method call, likely intended to be CupHit with the cup's position:
         gameManager.CupHit(transform.position);
 
         // Lift cup
