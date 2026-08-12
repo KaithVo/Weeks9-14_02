@@ -10,8 +10,8 @@ public class RingController : MonoBehaviour
     [Header("Movement")]
 
     public float moveSpeed = 5f;
-    public float minX = -4f;
-    public float maxX = 4f;
+    public float minX = -8f;
+    public float maxX = 8f;
 
     [Header("Ring")]
     public GameObject ringPrefab;
