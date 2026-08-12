@@ -1,5 +1,5 @@
+using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -20,15 +20,17 @@ public class GameManger : MonoBehaviour
     public GameObject congratulationsScreen;
 
     [Header("ResultText")]
-    public GameObject successPopup; 
-    public GameObject failurePopup;
+    public AnimationCurve curve;
+    public TextMeshProUGUI successText;
+    public TextMeshProUGUI failureText;
 
     [Header("List Of Cups")]
     public List<Cups> cups;
 
     //UnityEvent
-    public UnityEvent onScoreUpdated;
-    public UnityEvent onGameFinished;
+    //public UnityEvent onScoreUpdated;
+    //public UnityEvent onGameFinished;//fuck can't use when create loop and make game explode
+    public UnityEvent onSecretFound;//particle effect
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -36,6 +38,9 @@ public class GameManger : MonoBehaviour
         score = 0;
         gameFinished = false;
         congratulationsScreen.SetActive(false);
+
+        successText.gameObject.SetActive(false);
+        failureText.gameObject.SetActive(false);
 
         UpdateScoreText();
     }
@@ -51,18 +56,22 @@ public class GameManger : MonoBehaviour
         if (gameFinished)
             return; 
 
-        AddScore(); // 10% chance of surprise
 
+        // 10% chance of surprise
         bool secret = Random.Range(0, 100) < 10; 
        
-        if (secret) 
-        { 
-            ShowPopup( successPopup, cupPosition ); 
+        if (secret)
+        {
+            DisplayAnimatedText(successText);
+
+            AddScore();
+            onSecretFound.Invoke();
         } 
         else 
         {
-            ShowPopup( failurePopup,cupPosition ); 
-        } 
+            DisplayAnimatedText(failureText);
+
+        }
     }
 
 
@@ -91,7 +100,7 @@ public class GameManger : MonoBehaviour
 
         score += 1;
         UpdateScoreText();
-        onScoreUpdated.Invoke();
+        //onScoreUpdated.Invoke();
 
         if (score >= winningScore)
         {
@@ -103,7 +112,7 @@ public class GameManger : MonoBehaviour
     {
         gameFinished = true;
         congratulationsScreen.SetActive(true);
-        onGameFinished.Invoke();
+        //onGameFinished.Invoke();
     }
 
     //update score
@@ -114,12 +123,33 @@ public class GameManger : MonoBehaviour
 
     //instantite text
     //https://discussions.unity.com/t/instantiating-prefab-as-child-of-existing-gameobject-c/440787/10
-    private void ShowPopup(GameObject popupPrefab, Vector3 position) 
-    { 
 
-        GameObject popup = Instantiate(popupPrefab, position, Quaternion.identity); 
-        Destroy(popup, 1f);
 
+    private void DisplayAnimatedText(TextMeshProUGUI text)
+    {
+        text.gameObject.SetActive(true);
+        StartCoroutine(ShowText(text));
+    }
+
+    private IEnumerator ShowText(TextMeshProUGUI text)
+    {
+        float t = 0f;
+        while (t < 0.4f)
+        {
+            t += Time.deltaTime;
+            text.transform.localScale = Vector3.one * curve.Evaluate(t);
+            yield return null;
+        }
+
+        t = 0f;
+        while (t < 0.4f)
+        {
+            t += Time.deltaTime;
+            text.transform.localScale = Vector3.one * curve.Evaluate(1 - t);
+            yield return null;
+        }
+
+        text.gameObject.SetActive(false);
     }
 
     /// <summary>

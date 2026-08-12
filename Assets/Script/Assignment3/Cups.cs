@@ -58,7 +58,7 @@ public class Cups : MonoBehaviour
         {
             t +=Time.deltaTime /liftDuration;
 
-            float value =curve.Evaluate(t);
+            float value = curve.Evaluate(t);
 
             transform.position =Vector3.Lerp(startPosition,endPosition,value);
 
